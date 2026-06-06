@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AetherSec | Bug Hunting & Recon Suite</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="logo">
+            <span class="logo-icon"><i class="fa-solid fa-shield-halved"></i></span>
+            <div class="logo-text">
+                <h1>AETHER<span class="highlight">SEC</span></h1>
+                <span class="subtitle">Bug Hunting & Recon Suite</span>
+            </div>
+        </div>
+        <div class="system-status">
+            <span class="status-indicator online"></span>
+            <span class="status-label">INTEGRATION NODE ACTIVE</span>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- Control Center (Left/Top) -->
+        <section class="card control-panel">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-terminal"></i> Target Control</h2>
+            </div>
+            <div class="card-body">
+                <p class="panel-desc">Enter target domain or IP to start vulnerability scanning & reconnaissance.</p>
+                <div class="input-group">
+                    <input type="text" id="target-input" placeholder="e.g. example.com" value="google.com">
+                    <button class="clear-btn" id="clear-target"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div class="action-buttons">
+                    <button id="scan-btn" class="btn btn-primary">
+                        <span class="btn-icon"><i class="fa-solid fa-radar"></i></span>
+                        <span class="btn-text">Run Recon Scan</span>
+                    </button>
+                    <button id="fuzz-btn" class="btn btn-secondary">
+                        <span class="btn-icon"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+                        <span class="btn-text">Fuzz Endpoints</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Live Terminal / Logs -->
+        <section class="card terminal-panel">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-code"></i> Live Output Console</h2>
+                <button id="clear-terminal" class="icon-btn" title="Clear Console"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+            <div class="card-body terminal-body" id="console-logs">
+                <div class="log-line system">[SYSTEM] AetherSec client loaded. Waiting for target input...</div>
+            </div>
+        </section>
+
+        <!-- Target Info Metrics (Only visible when scanned) -->
+        <section class="card target-info-panel disabled" id="target-info-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-circle-info"></i> Target Overview</h2>
+            </div>
+            <div class="card-body info-grid">
+                <div class="info-item">
+                    <span class="info-label">Domain</span>
+                    <span class="info-value" id="val-domain">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">IP Address</span>
+                    <span class="info-value" id="val-ip">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">SSL Certificate</span>
+                    <span class="info-value" id="val-ssl">-</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">ISP / Host</span>
+                    <span class="info-value" id="val-isp">-</span>
+                </div>
+                <div class="info-item full-width">
+                    <span class="info-label">Geographic Location</span>
+                    <span class="info-value" id="val-geo">-</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Security Headers (Only visible when scanned) -->
+        <section class="card headers-panel disabled" id="headers-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-shield-virus"></i> Security Headers Audit</h2>
+            </div>
+            <div class="card-body">
+                <div class="headers-status-summary">
+                    <div class="status-gauge">
+                        <span class="gauge-value" id="gauge-score">0/6</span>
+                        <span class="gauge-label">Secure Headers</span>
+                    </div>
+                </div>
+                <ul class="header-list" id="header-audit-list">
+                    <!-- Dynamic List Items -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- DNS Records & Ports (Only visible when scanned) -->
+        <section class="card dns-ports-panel disabled" id="dns-ports-card">
+            <div class="card-header">
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="dns-tab">DNS Records</button>
+                    <button class="tab-btn" data-tab="ports-tab">Open Ports</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <!-- DNS Content -->
+                <div id="dns-tab" class="tab-content active">
+                    <div class="dns-grid" id="dns-record-container">
+                        <!-- Dynamic DNS Cards -->
+                    </div>
+                </div>
+                <!-- Ports Content -->
+                <div id="ports-tab" class="tab-content">
+                    <div class="ports-table-wrapper">
+                        <table class="ports-table">
+                            <thead>
+                                <tr>
+                                    <th>Port</th>
+                                    <th>Service</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ports-table-body">
+                                <!-- Dynamic Port rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Fuzzing Discoveries (Only visible when fuzzed) -->
+        <section class="card fuzz-results-panel disabled" id="fuzz-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-folder-tree"></i> Endpoint Discovery</h2>
+                <span class="badge" id="fuzz-count">0 Discovered</span>
+            </div>
+            <div class="card-body">
+                <div class="fuzz-table-wrapper">
+                    <table class="fuzz-table">
+                        <thead>
+                            <tr>
+                                <th>Path</th>
+                                <th>Status</th>
+                                <th>Size</th>
+                                <th>Response Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="fuzz-table-body">
+                            <!-- Dynamic Fuzzer rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Vulnerability Report Compiler -->
+        <section class="card report-panel">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-file-invoice"></i> Open Bug Bounty Report Builder</h2>
+            </div>
+            <div class="card-body">
+                <form id="report-form" class="report-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rep-target">Target Domain</label>
+                            <input type="text" id="rep-target" required placeholder="target.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="rep-type">Vulnerability Type</label>
+                            <select id="rep-type">
+                                <option value="Missing Security Headers">Missing Security Headers</option>
+                                <option value="Cross-Site Scripting (Reflected XSS)">Cross-Site Scripting (Reflected XSS)</option>
+                                <option value="SQL Injection (SQLi)">SQL Injection (SQLi)</option>
+                                <option value="Information Disclosure (Sensitive Files)">Information Disclosure (Sensitive Files)</option>
+                                <option value="Directory Traversal">Directory Traversal</option>
+                                <option value="Broken Authentication">Broken Authentication</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rep-severity">Severity</label>
+                            <select id="rep-severity">
+                                <option value="Low">Low</option>
+                                <option value="Medium" selected>Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rep-payload">Payload / Vulnerable URL</label>
+                            <input type="text" id="rep-payload" placeholder="e.g. /search?q=<script>alert(1)</script>">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="rep-desc">Vulnerability Description</label>
+                        <textarea id="rep-desc" rows="3" placeholder="Explain the vulnerability and its location..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="rep-remedy">Recommended Remediation</label>
+                        <textarea id="rep-remedy" rows="3" placeholder="Describe the remediation steps..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-accent full-width">
+                        <span class="btn-icon"><i class="fa-solid fa-file-export"></i></span>
+                        <span class="btn-text">Compile & Save Report</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 AetherSec Suite. Crafted for the Cyber Security Major Project. Educational and Responsible Use Only.</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
